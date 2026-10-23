@@ -18,6 +18,11 @@ select::-ms-expand{display:none}
 .boss-overview{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:16px 0}
 .boss-mini{min-width:0;padding:14px;border:1px solid var(--border);border-radius:12px;background:var(--raised)}
 .boss-mini.active{border-color:var(--lime);box-shadow:inset 0 0 0 1px var(--lime)}
+.boss-select{display:block;width:100%;padding:0;border:0;border-radius:8px;background:transparent;color:inherit;text-align:left;cursor:pointer}
+.boss-select:focus-visible{outline:2px solid var(--lime);outline-offset:4px}
+.boss-mini .boss-select>strong{display:block;min-height:2.8em;margin:0 0 12px;line-height:1.4}
+.boss-mini .boss-select>div{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-top:1px solid var(--border);font-size:12px}
+.boss-mini .boss-select>div span{color:var(--muted)}
 .boss-mini>strong{display:block;min-height:2.8em;margin-bottom:12px;line-height:1.4}
 .boss-mini>div{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-top:1px solid var(--border);font-size:12px}
 .boss-mini>div span{color:var(--muted)}
