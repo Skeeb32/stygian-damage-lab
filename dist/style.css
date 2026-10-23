@@ -28,3 +28,7 @@ select::-ms-expand{display:none}
 input[readonly]{color:var(--lime);background:#14211d;cursor:default}
 input:disabled,select:disabled{opacity:.72;cursor:not-allowed}
 @media(max-width:760px){.boss-overview{grid-template-columns:1fr}.boss-mini>strong{min-height:0}}
+
+.boss-json-editor{margin-top:18px;padding-top:14px;border-top:1px solid var(--border)}
+.boss-json-editor>summary{cursor:pointer;color:var(--lime);font-weight:600}
+.boss-json-editor textarea{min-height:320px;resize:vertical;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
