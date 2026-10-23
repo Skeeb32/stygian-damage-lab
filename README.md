@@ -44,11 +44,11 @@ The project began with a personal three-battle Stygian plan and a **210–218-se
 | Capability | What you can do |
 | :--- | :--- |
 | **🧩 Build a roster** | Edit three four-character teams. Browse every character in the live Genshin-DB catalog, split across pages, and filter by element, weapon type, or 4★ / 5★ rarity. A bundled list remains available if the API is offline. |
-| **⚔️ Tune the equipment** | Record levels, constellations, talents, weapons, refinements, and numerical stats. See weapon art and **4-piece / 2-piece + 2-piece** sets on character cards. |
+| **⚔️ Tune the equipment** | Select character and weapon levels from 1–90, choose ascended status at each breakpoint, and load matching base stats and ascension/secondary stats from Genshin-DB. Refinements, talents, artifacts, and passives remain explicit build inputs. See **4-piece / 2-piece + 2-piece** sets on character cards. |
 | **💎 Check artifact inputs** | Use slot-specific main stats, rarity/level tables, legal single-roll increments, duplicate-stat checks, and roll-budget warnings. Existing questionable values remain visible for correction. |
 | **📐 Inspect damage** | View non-CRIT, CRIT, and average damage, character contributions, rotation totals, DPS, and an HP-based clear estimate. Configure buffs with recipient, element, and uptime controls. |
 | **⚡ Budget opening energy** | Start at zero. Enter skill particles, Favonius procs, boss particles/orbs, and flat-energy events; account for catcher, element, and Energy Recharge. |
-| **🎯 Set the encounter** | Apply bundled Stygian 7.1 boss HP, level, and a selected resistance window, or enter your own enemy assumptions. |
+| **🎯 Set the encounter** | Review all three bundled Stygian 7.1 bosses, their N5/N6 HP, listed mechanics, and phase-specific resistance windows. Apply a phase to a team or enter your own assumptions. The guide is manually maintained and does not publish a documented boss API, so this is a dated snapshot rather than live boss data. |
 | **📊 Compare alternatives** | Compare up to three teams with a metric selector and optional common enemy. Save a separate comparison baseline while editing. |
 | **💾 Keep your experiments** | Save, load, rename, overwrite, and delete named teams in browser storage. Export/import JSON to back up builds and the saved-team library. |
 
@@ -113,6 +113,9 @@ flowchart LR
     Builder[builder.mjs: catalogs and saved teams] <--> App
     App <--> Storage[(Browser localStorage)]
     App <--> Backup[JSON import / export]
+    App --> GameStats[game-stats.mjs: level and ascension lookup]
+    GameStats --> GDB[(Genshin-DB stats API)]
+    GameStats <--> Cache[(12-hour browser cache)]
     App --> Damage[engine.mjs: damage and rotations]
     App --> Artifacts[artifact-rules.mjs: stat and roll checks]
     App --> Energy[energy.mjs: opening energy budget]
@@ -127,9 +130,9 @@ flowchart LR
 | **Separate calculation modules** | Damage, artifact rules, and energy estimation can be inspected independently of the DOM. Formula checks import the damage engine directly. |
 | **Explicit combat inputs** | Buff eligibility, coefficients, enemy resistance, and rotation length are visible assumptions. The output can be traced back to the entered build. |
 | **Browser-local persistence** | Team experiments need no application database. JSON exports provide a portable backup format. |
-| **Fresh catalog, safe fallback** | The character picker refreshes its catalog from Genshin-DB when opened, caches a successful response in the browser for six hours, and falls back to checked-in JSON when offline. Portraits use current HoYoWiki image URLs instead of retired icon links. |
+| **Fresh catalog, safe fallback** | The character picker refreshes its catalog from Genshin-DB when opened, caches a successful response in the browser for six hours, and falls back to checked-in JSON when offline. A separate stats lookup loads each supported character/weapon level and ascension row and caches it for 12 hours. Portraits use current HoYoWiki image URLs instead of retired icon links. |
 | **Validated imports** | Import checks cover structure, numeric bounds, allowed stats/actions, saved-team records, and forbidden object keys before replacing the current state. |
-| **Static delivery** | The application ships as HTML, CSS, JSON, assets, and nine ES modules, with no frontend framework or package dependency manifest. |
+| **Static delivery** | The application ships as HTML, CSS, JSON, assets, and ten ES modules, with no frontend framework or package dependency manifest. The app calls the public Genshin-DB API from the browser; no API key or backend is required. |
 
 <details>
 <summary><strong>Source map — where to start reading</strong></summary>
@@ -142,6 +145,7 @@ stygian-damage-lab/
 │   ├── app.mjs                 # State, editor, rendering, import/export
 │   ├── builder.mjs             # Catalog pickers, saved teams, comparison
 │   ├── engine.mjs              # Stats, buffs, damage, rotation totals
+│   ├── game-stats.mjs          # Genshin-DB level/ascension API and cache
 │   ├── artifact-rules.mjs      # Slot constraints and roll validation
 │   ├── artifact-tables.mjs     # Main-stat progression and substat rolls
 │   ├── energy.mjs              # Zero-start energy calculations
@@ -173,7 +177,9 @@ Clear time  = enemy HP / team DPS + entered downtime
 
 **This is an input-driven workbench.** Levels, talents, constellations, refinements, and set names do not automatically resolve all of their numerical effects. Sample stats and coefficients must be replaced with verified values. Element-specific ordinary damage uses the character's selected element; mixed-element actions need separate configurations.
 
-Energy is a total budget, not a timed rotation simulation. It does not automatically gate damage results. Aura application, cooldowns, special-resource mechanics, shields, overkill, and boss transitions are not simulated. Boss data is a dated **7.1 snapshot**, checked on **October 21, 2026**, rather than a live boss API feed.
+Energy is a total budget, not a timed rotation simulation. It does not automatically gate damage results. Aura application, cooldowns, special-resource mechanics, shields, overkill, and boss transitions are not simulated. Character base stats and level-based ascension bonuses, plus weapon base ATK and secondary stats, are fetched for the selected 1–90 level and ascension state from the Genshin-DB stats API. The manual-bonus section is for effects not already included in character progression, weapon stats, artifact stats, or enabled team buffs; examples explain when to enter a flat amount or percentage.
+
+Boss data is a dated **7.1 snapshot**, checked on **October 23, 2026**, rather than a live boss API feed. Stygian.moe describes its guide data as manually maintained; no public boss API is documented, so “Reload snapshot” refreshes the checked-in data only.
 
 The character picker checks Genshin-DB when opened and caches the list for six hours. Its API generally follows the main data package by one to two days, so newly released characters may take a short time to appear upstream. To update the repository's offline fallback, run `node scripts/update-character-catalog.mjs` from the project root. The current bundled catalog is **v7.1**.
 

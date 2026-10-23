@@ -13,3 +13,18 @@ select::-ms-expand{display:none}
 .catalog-pagination{grid-column:1/-1;position:sticky;bottom:0;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 6px;background:linear-gradient(180deg,transparent 0%,var(--bg) 22%);color:var(--muted);font-size:12px}
 .catalog-pagination button{padding:8px 12px;font-size:12px}
 @media(max-width:650px){.catalog-pagination{padding:9px 2px}.catalog-pagination button{padding:8px;font-size:11px}}
+
+/* Boss encounter reference and clearer level/stat controls */
+.boss-overview{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:16px 0}
+.boss-mini{min-width:0;padding:14px;border:1px solid var(--border);border-radius:12px;background:var(--raised)}
+.boss-mini.active{border-color:var(--lime);box-shadow:inset 0 0 0 1px var(--lime)}
+.boss-mini>strong{display:block;min-height:2.8em;margin-bottom:12px;line-height:1.4}
+.boss-mini>div{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-top:1px solid var(--border);font-size:12px}
+.boss-mini>div span{color:var(--muted)}
+.boss-window{margin:14px 0;padding:16px;border:1px solid var(--border);border-radius:12px;background:var(--raised)}
+.boss-window>strong{color:var(--lime)}
+.boss-window details{margin-top:12px}
+.manual-lead{max-width:75ch;color:var(--muted)}
+input[readonly]{color:var(--lime);background:#14211d;cursor:default}
+input:disabled,select:disabled{opacity:.72;cursor:not-allowed}
+@media(max-width:760px){.boss-overview{grid-template-columns:1fr}.boss-mini>strong{min-height:0}}
