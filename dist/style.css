@@ -32,3 +32,7 @@ input:disabled,select:disabled{opacity:.72;cursor:not-allowed}
 .boss-json-editor{margin-top:18px;padding-top:14px;border-top:1px solid var(--border)}
 .boss-json-editor>summary{cursor:pointer;color:var(--lime);font-weight:600}
 .boss-json-editor textarea{min-height:320px;resize:vertical;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
+
+.boss-home{margin:0 0 24px}
+.boss-home .boss-overview{margin:12px 0 0}
+.boss-home .boss-mini>strong{font-size:12px}

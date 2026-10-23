@@ -48,7 +48,7 @@ The project began with a personal three-battle Stygian plan and a **210–218-se
 | **💎 Check artifact inputs** | Use slot-specific main stats, rarity/level tables, legal single-roll increments, duplicate-stat checks, and roll-budget warnings. Existing questionable values remain visible for correction. |
 | **📐 Inspect damage** | View non-CRIT, CRIT, and average damage, character contributions, rotation totals, DPS, and an HP-based clear estimate. Configure buffs with recipient, element, and uptime controls; food is excluded because it is not allowed in Stygian Onslaught. |
 | **⚡ Budget opening energy** | Start at zero. Enter skill particles, Favonius procs, boss particles/orbs, and flat-energy events; account for catcher, element, and Energy Recharge. |
-| **🎯 Set the encounter** | Review all three bundled Stygian 7.1 bosses, their N5/N6 HP, listed mechanics, and phase-specific resistance windows. Apply a phase to a team, then edit the boss snapshot JSON in the app. Your update is saved in this browser and can be reset to the bundled snapshot. The guide is manually maintained and does not publish a documented boss API. |
+| **🎯 Set the encounter** | See a homepage summary of all three Stygian 7.1 bosses with Fearless (Difficulty V) and Dire (Difficulty VI) HP. The Enemy & goal panel adds listed mechanics and phase-specific resistance windows. Apply a phase to a team, then edit the boss snapshot JSON in the app. Your update is saved in this browser and can be reset to the bundled snapshot. The guide is manually maintained and does not publish a documented boss API. |
 | **📊 Compare alternatives** | Compare up to three teams with a metric selector and optional common enemy. Save a separate comparison baseline while editing. |
 | **💾 Keep your experiments** | Save, load, rename, overwrite, and delete named teams in browser storage. Export/import JSON to back up builds and the saved-team library. |
 
@@ -98,7 +98,7 @@ There is no package installation, `.env` configuration, API key, or build comman
 1. **Name a battle.** Use the team-name fields, then select a character card and browse the catalog to replace a roster slot.
 2. **Enter the real build.** Configure character/weapon stats, artifact pieces, and exact attack coefficients. Newly selected characters begin with example inputs.
 3. **Enable eligible buffs.** Set their values, recipients, and uptime. Equipment names and refinements alone do not apply every passive.
-4. **Define the encounter.** Enter enemy HP, level, resistance, and downtime, or apply a bundled boss window.
+4. **Define the encounter.** Enter enemy HP, level, resistance, and downtime, or apply a bundled Fearless or Dire boss window.
 5. **Check Energy.** Enter burst costs and the events your opening produces. Review deficits before assuming the rotation is executable.
 6. **Save and compare.** Save a named team, change a weapon or teammate, save another version, and open **Compare teams**. Enable **Use common enemy** for a consistent comparison.
 7. **Export a backup.** Keep the JSON file to restore your work later or transfer it to another browser.
@@ -179,7 +179,7 @@ Clear time  = enemy HP / team DPS + entered downtime
 
 Energy is a total budget, not a timed rotation simulation. It does not automatically gate damage results. Aura application, cooldowns, special-resource mechanics, shields, overkill, and boss transitions are not simulated. Character base stats and level-based ascension bonuses, plus weapon base ATK and secondary stats, are fetched for the selected 1–90 level and ascension state from the Genshin-DB stats API. The manual-bonus section is for effects not already included in character progression, weapon stats, artifact stats, or enabled team buffs; examples explain when to enter a flat amount or percentage.
 
-Boss data is a dated **7.1 snapshot**, checked on **October 23, 2026**, rather than a live boss API feed. Stygian.moe describes its guide data as manually maintained; no public boss API is documented. The Enemy & goal panel includes an editable JSON copy; saving keeps the update in that browser, while “Reset to bundled snapshot” restores the checked-in reference. Browser-local changes are not shared between devices or written back to the repository.
+The homepage shows the current **7.1 Fearless and Dire HP for all three bosses** at a glance. Boss data is a dated **7.1 snapshot**, checked on **October 23, 2026**, rather than a live boss API feed. Stygian.moe describes its guide data as manually maintained; no public boss API is documented. The Enemy & goal panel lists each boss’s Fearless (Level 105) and Dire (Level 110) HP and includes an editable JSON copy; saving keeps the update in that browser, while “Reset to bundled snapshot” restores the checked-in reference. Browser-local changes are not shared between devices or written back to the repository.
 
 The character picker checks Genshin-DB when opened and caches the list for six hours. Its API generally follows the main data package by one to two days, so newly released characters may take a short time to appear upstream. To update the repository's offline fallback, run `node scripts/update-character-catalog.mjs` from the project root. The current bundled catalog is **v7.1**.
 
@@ -241,7 +241,8 @@ Built by [**Skeeb32**](https://github.com/Skeeb32).
 | [genshin-db](https://github.com/theBowja/genshin-db) and [genshin-db API](https://github.com/theBowja/genshin-db-api) | Character, weapon, and artifact metadata; artwork references and fallback lookups |
 | [Genshin Optimizer](https://github.com/frzyc/genshin-optimizer) | Artifact main-stat progression and substat roll tables |
 | [KQM Theorycrafting Library](https://library.keqingmains.com/) | Damage and [energy](https://library.keqingmains.com/combat-mechanics/energy) references; additional formula links are included in the app |
-| [Stygian.moe](https://www.stygian.moe/) | Bundled boss HP and resistance-window reference data |
+| [GamesAndChill](https://gamesandchill.com/en/end-game/conflagration/) | Published Fearless/Dire HP values; the page attributes them to a datamined chart |
+| [Stygian.moe](https://www.stygian.moe/) | Season and boss-mechanics reference |
 
 Unofficial fan project, unaffiliated with HoYoverse. Genshin Impact and game artwork belong to their respective owners. No project license file is currently included; upstream data and artwork retain their respective rights and terms.
 
