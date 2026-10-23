@@ -175,7 +175,7 @@ Team DPS    = team damage / entered rotation duration
 Clear time  = enemy HP / team DPS + entered downtime
 ```
 
-**This is an input-driven workbench.** Levels, talents, constellations, refinements, and set names do not automatically resolve all of their numerical effects. Sample stats and coefficients must be replaced with verified values. Element-specific ordinary damage uses the character's selected element; mixed-element actions need separate configurations.
+**This is an input-driven workbench.** Character and weapon levels fetch their base progression and ascension stats, but talents, constellations, refinements, set names, and equipment passives do not automatically resolve all numerical effects. Sample attack coefficients and unmodeled stats must be replaced with verified values. Element-specific ordinary damage uses the character's selected element; mixed-element actions need separate configurations.
 
 Energy is a total budget, not a timed rotation simulation. It does not automatically gate damage results. Aura application, cooldowns, special-resource mechanics, shields, overkill, and boss transitions are not simulated. Character base stats and level-based ascension bonuses, plus weapon base ATK and secondary stats, are fetched for the selected 1–90 level and ascension state from the Genshin-DB stats API. The manual-bonus section is for effects not already included in character progression, weapon stats, artifact stats, or enabled team buffs; examples explain when to enter a flat amount or percentage.
 
