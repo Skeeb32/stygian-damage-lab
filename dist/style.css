@@ -36,3 +36,10 @@ input:disabled,select:disabled{opacity:.72;cursor:not-allowed}
 .boss-home{margin:0 0 24px}
 .boss-home .boss-overview{margin:12px 0 0}
 .boss-home .boss-mini>strong{font-size:12px}
+
+.boss-art-frame{height:150px;position:relative;display:grid;place-items:center;overflow:hidden;margin:-3px 0 12px;border-radius:8px;background:radial-gradient(ellipse at 50% 55%,#34493d 0%,#24362f 38%,#1a2925 74%)}
+.boss-art{position:relative;width:100%;height:100%;object-fit:contain;object-position:center;filter:drop-shadow(0 8px 16px #0008)}
+.boss-art-fallback{position:absolute;color:var(--lime);font-size:42px;opacity:.42}
+.boss-home .boss-mini{padding:12px}
+.boss-home .boss-art-frame{height:128px}
+@media(max-width:760px){.boss-art-frame{height:180px}.boss-home .boss-art-frame{height:180px}}
