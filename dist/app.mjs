@@ -1,9 +1,9 @@
 import {slots,subKeys,maxLevel,mainKeys,mainValue,rolls,artifactIssues,applyMain,addRoll} from './artifact-rules.mjs';
 import {energyBudget} from './energy.mjs';
-import {setupBuilder} from './builder.mjs?v=7';
-import {mediaMarkup,hydrateMedia,findMedia,normalizeName,resolveName} from './media.mjs?v=4';
-import {defaults,character,weapons,statNames,buff} from './data.mjs?v=7';
-import {calc,effective,stats} from './engine.mjs?v=7';
+import {setupBuilder} from './builder.mjs?v=8';
+import {mediaMarkup,hydrateMedia,findMedia,normalizeName,resolveName} from './media.mjs?v=8';
+import {defaults,character,weapons,statNames,buff} from './data.mjs?v=8';
+import {calc,effective,stats} from './engine.mjs?v=8';
 let state;try{state=JSON.parse(localStorage.getItem('stygian-lab-v1'));if(!state||state.version!==1)state=defaults()}catch{state=defaults()}
 const $=s=>document.querySelector(s), esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),num=(n,d=0)=>Number.isFinite(n)?n.toLocaleString('en-US',{maximumFractionDigits:d}):'—', short=n=>n>=1e6?(n/1e6).toFixed(2)+'m':n>=1000?(n/1000).toFixed(1)+'k':num(n), team=()=>state.teams[state.selected],char=()=>team().chars[state.member];
 let timer;function toast(s){$('#toast').textContent=s;$('#toast').style.display='block';clearTimeout(timer);timer=setTimeout(()=>$('#toast').style.display='none',3500)}

@@ -43,7 +43,7 @@ The project began with a personal three-battle Stygian plan and a **210–218-se
 
 | Capability | What you can do |
 | :--- | :--- |
-| **🧩 Build a roster** | Edit three four-character teams. Search the bundled catalog by name and filter by element, weapon type, or rarity where applicable. |
+| **🧩 Build a roster** | Edit three four-character teams. Browse every character in the live Genshin-DB catalog, split across pages, and filter by element, weapon type, or 4★ / 5★ rarity. A bundled list remains available if the API is offline. |
 | **⚔️ Tune the equipment** | Record levels, constellations, talents, weapons, refinements, and numerical stats. See weapon art and **4-piece / 2-piece + 2-piece** sets on character cards. |
 | **💎 Check artifact inputs** | Use slot-specific main stats, rarity/level tables, legal single-roll increments, duplicate-stat checks, and roll-budget warnings. Existing questionable values remain visible for correction. |
 | **📐 Inspect damage** | View non-CRIT, CRIT, and average damage, character contributions, rotation totals, DPS, and an HP-based clear estimate. Configure buffs with recipient, element, and uptime controls. |
@@ -127,7 +127,7 @@ flowchart LR
 | **Separate calculation modules** | Damage, artifact rules, and energy estimation can be inspected independently of the DOM. Formula checks import the damage engine directly. |
 | **Explicit combat inputs** | Buff eligibility, coefficients, enemy resistance, and rotation length are visible assumptions. The output can be traced back to the entered build. |
 | **Browser-local persistence** | Team experiments need no application database. JSON exports provide a portable backup format. |
-| **Bundled data with targeted lookups** | Catalog browsing uses a checked-in JSON snapshot. Artwork lookup normalizes aliases, deduplicates pending requests, times out failed requests, and restricts fallback image hosts. |
+| **Fresh catalog, safe fallback** | The character picker refreshes its catalog from Genshin-DB when opened, caches a successful response in the browser for six hours, and falls back to checked-in JSON when offline. Portraits use current HoYoWiki image URLs instead of retired icon links. |
 | **Validated imports** | Import checks cover structure, numeric bounds, allowed stats/actions, saved-team records, and forbidden object keys before replacing the current state. |
 | **Static delivery** | The application ships as HTML, CSS, JSON, assets, and nine ES modules, with no frontend framework or package dependency manifest. |
 
@@ -152,6 +152,7 @@ stygian-damage-lab/
 │   ├── stygian-bosses.json     # Dated boss snapshot
 │   └── assets/                # Local game artwork
 ├── docs/assets/               # README banner and app screenshot
+├── scripts/update-character-catalog.mjs # Refresh bundled character fallback data
 ├── test.mjs                   # Formula regression assertions
 └── README.md
 ```
@@ -173,6 +174,8 @@ Clear time  = enemy HP / team DPS + entered downtime
 **This is an input-driven workbench.** Levels, talents, constellations, refinements, and set names do not automatically resolve all of their numerical effects. Sample stats and coefficients must be replaced with verified values. Element-specific ordinary damage uses the character's selected element; mixed-element actions need separate configurations.
 
 Energy is a total budget, not a timed rotation simulation. It does not automatically gate damage results. Aura application, cooldowns, special-resource mechanics, shields, overkill, and boss transitions are not simulated. Boss data is a dated **7.1 snapshot**, checked on **October 21, 2026**, rather than a live boss API feed.
+
+The character picker checks Genshin-DB when opened and caches the list for six hours. Its API generally follows the main data package by one to two days, so newly released characters may take a short time to appear upstream. To update the repository's offline fallback, run `node scripts/update-character-catalog.mjs` from the project root. The current bundled catalog is **v7.1**.
 
 ## Verification & project activity
 
