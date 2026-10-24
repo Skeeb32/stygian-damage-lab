@@ -14,7 +14,7 @@ budgeting opening energy, and comparing the rotations you design.
 [![Last commit](https://img.shields.io/github/last-commit/Skeeb32/stygian-damage-lab?style=flat-square&color=8bc8b5&labelColor=172623)](https://github.com/Skeeb32/stygian-damage-lab/commits/main/)
 
 ![JavaScript ES modules](https://img.shields.io/badge/JavaScript-ES_modules-f7df1e?style=flat-square&logo=javascript&logoColor=f7df1e&labelColor=172623)
-![No build step](https://img.shields.io/badge/Build_step-none-d8ed9a?style=flat-square&labelColor=172623)
+![Cloudflare Worker](https://img.shields.io/badge/API-Cloudflare_Worker-f38020?style=flat-square&logo=cloudflare&logoColor=white&labelColor=172623)
 ![Browser-local storage](https://img.shields.io/badge/Storage-browser_local-8bc8b5?style=flat-square&labelColor=172623)
 
 [**Run it locally →**](#quick-start) · [Explore the features](#inside-the-lab) · [Read the architecture](#under-the-hood) · [Contribute](#build-with-us)
@@ -46,7 +46,9 @@ The project began with a personal three-battle Stygian plan and a **210–218-se
 | **🧩 Build a roster** | Edit three four-character teams. Browse every character in the live Genshin-DB catalog, split across pages, and filter by element, weapon type, or 4★ / 5★ rarity. A bundled list remains available if the API is offline. |
 | **⚔️ Tune the equipment** | Select character and weapon levels from 1–90, choose ascended status at each breakpoint, and load matching base stats and ascension/secondary stats from Genshin-DB. Refinements, talents, artifacts, and passives remain explicit build inputs. See **4-piece / 2-piece + 2-piece** sets on character cards. |
 | **💎 Check artifact inputs** | Use slot-specific main stats, rarity/level tables, legal single-roll increments, duplicate-stat checks, and roll-budget warnings. Existing questionable values remain visible for correction. |
-| **🖼️ Import Akasha CV screenshots** | Choose a character-card PNG to run OCR in your browser, review and correct the detected character, weapon, set, and total stats, then save the build profile locally. Screenshot files are not uploaded or saved. Multiple profiles for a character open a chooser before you equip one. Piece-level artifact main stats and substats still need manual entry because their icons are not reliably recognized. |
+| **🖼️ Import Akasha CV screenshots** | Choose a character-card PNG to run OCR in your browser, review and correct the detected character, weapon, set, total stats, and displayed Top % rank, then save the build profile locally. Screenshot files are not uploaded or saved. Multiple profiles for a character open a chooser before you equip one. Piece-level artifact main stats and substats still need manual entry because their icons are not reliably recognized. The header rank is imported from the screenshot, not queried live from Akasha. |
+| **🪪 Import a public UID showcase** | Enter a 9-digit UID to look up public Enka.Network showcase characters, levels, constellations, weapons, and visible artifact sets. Review a character and apply it to the selected team slot, or save it as a local profile for later. This is not account login and does not expose a full private inventory; the showcase must be public. |
+| **📦 Import account inventory** | Read a GOOD v1–v3 JSON export in the browser, review its character/weapon/artifact counts and sample records, then save the snapshot locally. Inventory snapshots stay separate from team builds and never automatically replace equipment. |
 | **📐 Inspect damage** | View non-CRIT, CRIT, and average damage, character contributions, rotation totals, DPS, and an HP-based clear estimate. Configure buffs with recipient, element, and uptime controls; food is excluded because it is not allowed in Stygian Onslaught. |
 | **⚡ Budget opening energy** | Start at zero. Enter skill particles, Favonius procs, boss particles/orbs, and flat-energy events; account for catcher, element, and Energy Recharge. |
 | **🎯 Set the encounter** | See a homepage summary with rendered boss artwork and expandable trait descriptions for all three Stygian 7.1 bosses, including Fearless (Difficulty V) and Dire (Difficulty VI) HP. The Enemy & goal panel adds listed mechanics and phase-specific resistance windows. Apply a phase to a team, then edit the boss snapshot JSON in the app. Your update is saved in this browser and can be reset to the bundled snapshot. The guide is manually maintained and does not publish a documented boss API. |
@@ -63,7 +65,7 @@ The project began with a personal three-battle Stygian plan and a **210–218-se
 
 ## Quick start
 
-**Prerequisites:** Git, Python 3 for the local static server, and a modern browser. Install a current Node.js LTS release if you want to run the formula checks.
+**Prerequisites:** Git, Node.js 20 or newer, and a modern browser.
 
 ### 1. Clone
 
@@ -72,17 +74,18 @@ git clone https://github.com/Skeeb32/stygian-damage-lab.git
 cd stygian-damage-lab
 ```
 
-### 2. Serve
+### 2. Build and serve
 
 ```sh
-python3 -m http.server 8766 --bind 127.0.0.1 --directory dist
+node scripts/build-worker.mjs
+node scripts/preview-worker.mjs
 ```
 
 ### 3. Open
 
 Visit **[http://localhost:8766](http://localhost:8766)**. Stop the server with `Ctrl+C`.
 
-There is no package installation, `.env` configuration, API key, or build command. The browser loads native JavaScript modules directly. Use the HTTP server rather than opening `index.html` as a file, because the app fetches local JSON and imports modules.
+No package installation, `.env` file, or API key is needed. The build packages the app's static files with the Worker endpoint that proxies public UID lookups through Enka.Network. Local preview uses the same Worker entrypoint as hosting, so both the UI and `/api/enka` route work together. Use the server rather than opening `index.html` as a file because the app fetches local data and imports modules.
 
 <details>
 <summary><strong>Troubleshooting & deployment</strong></summary>
@@ -91,7 +94,8 @@ There is no package installation, `.env` configuration, API key, or build comman
 - **Missing artwork:** some images and fallback lookups require internet access. The app provides image fallbacks when these requests fail.
 - **Missing saved teams:** storage belongs to the browser profile and site origin. A different hostname, port, device, or browser has a different library. Export before moving or clearing browser data.
 - **Akasha import needs a connection the first time:** OCR uses the Tesseract.js browser engine and English data from public CDNs. The selected PNG is processed in the browser; only the OCR software and language data are downloaded. Review the detected values before saving, and enter artifact piece details manually.
-- **Deploy elsewhere:** publish the contents of `dist/` as the root of a static website. Preserve relative paths and serve `.mjs` files as JavaScript. No compilation is needed. Hosted publication is separate from this repository; no deployment workflow is checked in.
+- **UID lookup:** use a valid nine-digit UID with a public character showcase. No password or game credentials are requested. Enka's `ttl` controls response caching; the lookup cannot import hidden characters or the full account inventory.
+- **Deploy elsewhere:** deploy `dist/server/index.js` as a Cloudflare-compatible Worker. It serves the packaged UI and the `/api/enka` endpoint. `node scripts/build-worker.mjs` regenerates this self-contained bundle from `dist/`.
 
 </details>
 
@@ -113,6 +117,12 @@ There is no package installation, `.env` configuration, API key, or build comman
 flowchart LR
     User[Build and encounter inputs] --> App[app.mjs: state and UI]
     Builder[builder.mjs: catalogs and saved teams] <--> App
+    App --> Good[good-import.mjs: GOOD JSON validation]
+    App --> Enka[builder.mjs: UID lookup and saved showcase profiles]
+    Enka --> Worker[Worker /api/enka proxy]
+    Worker --> EnkaAPI[Enka.Network public showcase API]
+    Enka --> EnkaCache[(TTL-aware browser cache)]
+    Good --> Storage
     App <--> Storage[(Browser localStorage)]
     App <--> Backup[JSON import / export]
     App --> GameStats[game-stats.mjs: level and ascension lookup]
@@ -132,9 +142,10 @@ flowchart LR
 | **Separate calculation modules** | Damage, artifact rules, and energy estimation can be inspected independently of the DOM. Formula checks import the damage engine directly. |
 | **Explicit combat inputs** | Buff eligibility, coefficients, enemy resistance, and rotation length are visible assumptions. The output can be traced back to the entered build. |
 | **Browser-local persistence** | Team experiments need no application database. JSON exports provide a portable backup format. |
+| **Separate account snapshots** | GOOD files are validated and previewed before local save; the imported roster and items remain distinct from hypothetical team edits. |
 | **Fresh catalog, safe fallback** | The character picker refreshes its catalog from Genshin-DB when opened, caches a successful response in the browser for six hours, and falls back to checked-in JSON when offline. A separate stats lookup loads each supported character/weapon level and ascension row and caches it for 12 hours. Portraits use current HoYoWiki image URLs instead of retired icon links. |
 | **Validated imports** | Import checks cover structure, numeric bounds, allowed stats/actions, saved-team records, and forbidden object keys before replacing the current state. |
-| **Static delivery** | The application ships as HTML, CSS, JSON, assets, and ten ES modules, with no frontend framework or package dependency manifest. The app calls the public Genshin-DB API from the browser; no API key or backend is required. |
+| **Small Worker backend** | The browser still loads native ES modules without a framework, while one Cloudflare Worker serves the UI and proxies UID requests so the API's custom User-Agent requirement does not depend on browser CORS. Genshin-DB catalog and stat requests remain browser-side. |
 
 <details>
 <summary><strong>Source map — where to start reading</strong></summary>
@@ -163,7 +174,7 @@ stygian-damage-lab/
 └── README.md
 ```
 
-Despite its name, **`dist/` contains the editable application source**. There is no separate build-generated source tree.
+Despite its name, **`dist/` contains the editable application source**. `dist/server/index.js` is generated by `scripts/build-worker.mjs` for deployment and local Worker preview.
 
 </details>
 

@@ -25,6 +25,7 @@ export function parseAkashaText(text,catalog={characters:[],weapons:[],artifacts
   const source=String(text||''),chars=catalogMatch(source,catalog.characters||[]),weapon=catalogMatch(source,catalog.weapons||[]),set=catalogMatch(source,catalog.artifacts||[]);
   const levels=[...source.matchAll(/\bLv\.?\s*(\d{1,3})\s*\/\s*\d{1,3}/gi)];
   const refine=source.match(/\bR\s*([1-5])\b/i);
+  const top=source.match(/\bTOP\s*([0-9]{1,3}(?:\.\d+)?)\s*%/i);
   const stat={
     hp:metric(source,['Max\\s*HP','HP\\s*(?=\\d)']),
     atk:metric(source,['ATK\\s*(?=\\d)']),
@@ -35,7 +36,7 @@ export function parseAkashaText(text,catalog={characters:[],weapons:[],artifacts
     er:metric(source,['Energy\\s*Recharge','Recharge'],true),
     dmg:metric(source,['(?:Anemo|Cryo|Dendro|Electro|Geo|Hydro|Pyro)\\s*DMG(?:\\s*Bonus)?'],true)
   };
-  return {character:chars?.name||'',element:chars?.element||'',weapon:weapon?.name||'',set:set?.name||'',level:Number(levels[0]?.[1])||90,weaponLevel:Number(levels[1]?.[1])||90,refine:Number(refine?.[1])||1,stats:stat,raw:source};
+  return {character:chars?.name||'',element:chars?.element||'',weapon:weapon?.name||'',set:set?.name||'',level:Number(levels[0]?.[1])||90,weaponLevel:Number(levels[1]?.[1])||90,refine:Number(refine?.[1])||1,topPercent:top?Number(top[1]):null,stats:stat,raw:source};
 }
 
 async function loadTesseract(){

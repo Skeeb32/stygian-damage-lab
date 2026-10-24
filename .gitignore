@@ -3,4 +3,6 @@
 .env.*
 node_modules/
 .openai/
+dist/server/
+dist/.openai/
 *.tar.gz
