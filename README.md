@@ -244,6 +244,7 @@ Built by [**Skeeb32**](https://github.com/Skeeb32).
 | [Genshin Optimizer](https://github.com/frzyc/genshin-optimizer) | Artifact main-stat progression and substat roll tables |
 | [KQM Theorycrafting Library](https://library.keqingmains.com/) | Damage and [energy](https://library.keqingmains.com/combat-mechanics/energy) references; additional formula links are included in the app |
 | [Stygian.moe](https://www.stygian.moe/) | Published Level 105/110 boss HP, artwork, and mechanic reference pages |
+| [Genshin Impact Wiki · Element Icons](https://genshin-impact.fandom.com/wiki/Category:Element_Icons) | Local copies of the seven in-game elemental sigils used on character cards |
 
 Unofficial fan project, unaffiliated with HoYoverse. Genshin Impact and game artwork belong to their respective owners. No project license file is currently included; upstream data and artwork retain their respective rights and terms.
 
