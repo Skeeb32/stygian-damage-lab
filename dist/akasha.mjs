@@ -60,6 +60,8 @@ function crop(file,rect){
 export async function readAkashaPng(file,onProgress=()=>{}){
   if(!file||file.type!=='image/png')throw new Error('Choose an Akasha CV PNG screenshot.');
   if(file.size>18*1024*1024)throw new Error('PNG must be smaller than 18 MB.');
+  let dimensions;try{dimensions=await createImageBitmap(file)}catch{throw new Error('The PNG could not be decoded. Choose a valid Akasha screenshot.')}
+  const pixels=dimensions.width*dimensions.height;dimensions.close();if(pixels>32_000_000)throw new Error('This image is too large to process safely. Choose a screenshot under 32 megapixels.');
   const Tesseract=await loadTesseract();
   const worker=await Tesseract.createWorker('eng',1,{workerPath:OCR_WORKER,corePath:OCR_CORE,langPath:OCR_LANG,logger:m=>{if(m.status==='recognizing text')onProgress(Math.round((m.progress||0)*100))}});
   try{
