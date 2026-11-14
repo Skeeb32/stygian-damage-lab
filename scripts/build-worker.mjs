@@ -30,10 +30,13 @@ for (const filename of files) {
   entries[key] = { type: mime[extname(filename).toLowerCase()] || 'application/octet-stream', body: (await readFile(filename)).toString('base64') };
 }
 
-const workerSource = (await readFile(resolve(root, 'worker/index.js'), 'utf8')).replace(/^import \{ assets \} from '\.\/assets\.mjs';\s*/m, '');
+const rosterSource = (await readFile(resolve(dist, 'stygian-roster.mjs'), 'utf8')).replace(/^export /gm, '');
+const workerSource = (await readFile(resolve(root, 'worker/index.js'), 'utf8'))
+  .replace(/^import \{ assets \} from '\.\/assets\.mjs';\s*/m, '')
+  .replace(/^import \{ readLiveStygianRoster \} from '\.\.\/dist\/stygian-roster\.mjs';\s*/m, '');
 if (workerSource === undefined || !workerSource.includes('export default')) throw new Error('Worker entrypoint is missing.');
 await mkdir(server, { recursive: true });
-await writeFile(resolve(server, 'index.js'), `const assets = JSON.parse(${JSON.stringify(JSON.stringify(entries))});\n${workerSource}`);
+await writeFile(resolve(server, 'index.js'), `const assets = JSON.parse(${JSON.stringify(JSON.stringify(entries))});\n${rosterSource}\n${workerSource}`);
 await mkdir(resolve(dist, '.openai'), { recursive: true });
 await writeFile(resolve(dist, '.openai/hosting.json'), await readFile(resolve(root, '.openai/hosting.json')));
 console.log(`Built Worker with ${files.length} static assets (${(Buffer.byteLength(JSON.stringify(entries)) / 1024 / 1024).toFixed(2)} MiB encoded).`);

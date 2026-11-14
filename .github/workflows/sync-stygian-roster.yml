@@ -1,0 +1,39 @@
+name: Sync Stygian boss roster
+
+on:
+  schedule:
+    - cron: '17 7 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-stygian-roster
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Refresh published Stygian encounter data
+        run: node scripts/update-stygian-bosses.mjs
+      - name: Commit refreshed snapshot when data changed
+        run: |
+          if git diff --quiet -- dist/stygian-bosses.json; then
+            echo "No Stygian data changes detected."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dist/stygian-bosses.json
+          git commit -m "chore: sync Stygian boss roster"
+          git push origin HEAD:main

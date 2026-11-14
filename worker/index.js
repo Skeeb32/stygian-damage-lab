@@ -1,4 +1,5 @@
 import { assets } from './assets.mjs';
+import { readLiveStygianRoster } from '../dist/stygian-roster.mjs';
 
 const USER_AGENT = 'StygianDamageLab/1.0 (https://github.com/Skeeb32/stygian-damage-lab)';
 const MAX_UPSTREAM_BYTES = 2 * 1024 * 1024;
@@ -75,6 +76,22 @@ async function enka(request, ctx) {
   return result;
 }
 
+async function stygianRoster(request, ctx) {
+  const url = new URL(request.url);
+  const cache = globalThis.caches?.default;
+  const cacheKey = new Request(`${url.origin}/__stygian-roster-cache/v1`);
+  const cached = await cache?.match(cacheKey);
+  if (cached) return cached;
+  try {
+    const roster = await readLiveStygianRoster(fetch);
+    const result = json(roster, 200, { 'cache-control': 'public, max-age=1800' });
+    if (cache) ctx?.waitUntil?.(cache.put(cacheKey, result.clone()));
+    return result;
+  } catch {
+    return json({ error: 'The current Stygian roster could not be refreshed. The bundled snapshot is still available.' }, 503);
+  }
+}
+
 export default {
   async fetch(request, env, ctx) {
     void env;
@@ -82,6 +99,10 @@ export default {
     if (url.pathname === '/api/enka') {
       if (request.method !== 'GET') return json({ error: 'Use GET for UID lookups.' }, 405, { allow: 'GET' });
       return enka(request, ctx);
+    }
+    if (url.pathname === '/api/stygian-bosses') {
+      if (request.method !== 'GET') return json({ error: 'Use GET to refresh Stygian boss data.' }, 405, { allow: 'GET' });
+      return stygianRoster(request, ctx);
     }
 
     const path = decodeURIComponent(url.pathname || '/');

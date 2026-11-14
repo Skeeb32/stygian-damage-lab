@@ -192,7 +192,7 @@ Clear time  = enemy HP / team DPS + entered downtime
 
 Energy is a total budget, not a timed rotation simulation. It does not automatically gate damage results. Aura application, cooldowns, special-resource mechanics, shields, overkill, and boss transitions are not simulated. Character base stats and level-based ascension bonuses, plus weapon base ATK and secondary stats, are fetched for the selected 1–90 level and ascension state from the Genshin-DB stats API. The manual-bonus section is for effects not already included in character progression, weapon stats, artifact stats, or enabled team buffs; examples explain when to enter a flat amount or percentage.
 
-The homepage shows all three current **7.2 Fearless and Dire bosses**: Wavebinder: Stormfang, Emperor of Fire and Iron, and Radiant Moongecko. The checked-in snapshot was verified on **November 14, 2026** and records the current season dates, level 105/110 HP, sourced resistance windows, boss traits, and mechanics. Stygian.moe describes its guide data as manually maintained; no public boss API is documented. The Enemy & goal panel includes the same current data and an editable JSON copy; browser edits are local and do not update the repository. If an older browser snapshot is detected, it is archived locally and the new bundled 7.2 snapshot is loaded.
+The homepage shows all three current **7.2 Fearless and Dire bosses**: Wavebinder: Stormfang, Emperor of Fire and Iron, and Radiant Moongecko. The checked-in snapshot was verified on **November 14, 2026** and records the current season dates, level 105/110 HP, published resistance windows, artwork, and mechanical-guide text. Stygian.moe does not document a public boss API, so the app reads its published pages instead. The Worker refreshes the roster on demand and caches it for up to 30 minutes; the app also displays a checked-in snapshot immediately and keeps the last successful roster in browser storage for offline or upstream-failure fallback. A daily GitHub Actions workflow updates `dist/stygian-bosses.json` when Stygian publishes a new version or roster. Existing trait notes and team recommendations remain curated, while newly discovered bosses receive no invented strategies. Browser edits remain local and are archived when the season version changes.
 
 The character picker checks Genshin-DB when opened and caches the list for six hours. Its API generally follows the main data package by one to two days, so newly released characters may take a short time to appear upstream. To update the repository's offline fallback, run `node scripts/update-character-catalog.mjs` from the project root. The bundled character catalog is **v7.1**; it is separate from the current 7.2 Stygian boss snapshot.
 
@@ -223,7 +223,7 @@ The badges above show live GitHub stars, forks, and last-commit activity. Browse
 - [ ] GitHub Actions for the existing formula checks
 - [ ] Verified character/talent scaling and more weapon/passive presets
 - [ ] Per-action elements and richer encounter modeling
-- [ ] A repeatable, source-attributed catalog and boss-data refresh process
+- [x] Daily, source-attributed Stygian roster and boss-data refresh
 
 ## Build with us
 
