@@ -10,7 +10,7 @@ import {normalizeEnkaShowcase,validateUid} from './dist/enka-import.mjs';
 import {reconcileBossSnapshot} from './dist/boss-snapshot.mjs';
 const bossData=JSON.parse(readFileSync(new URL('./dist/stygian-bosses.json',import.meta.url),'utf8'));
 assert.equal(bossData.version,'7.2');assert.deepEqual(bossData.bosses.map(b=>[b.id,b.hp['105'],b.hp['110']]),[['stormfang',15310194,33517377],['emperor',8552749,14042886],['moongecko',10253199,20950072]]);
-assert.equal(bossData.bosses.length,3);assert.ok(bossData.bosses.every(b=>b.guide.teams.length>=3));
+assert.equal(bossData.bosses.length,3);assert.ok(bossData.bosses.every(b=>b.guide.teams.length>=3));assert.match(bossData.bosses[1].image,/pyro_crab\.png$/);assert.match(bossData.bosses[2].image,/gecko\.png$/);
 assert.deepEqual(bossData.bosses[0].phases.map(p=>[p.resByElement.Electro,p.resByElement.Hydro]),[[-10,70],[10,130]]);
 assert.equal(bossData.bosses[1].phases[1].res,null);assert.deepEqual(bossData.bosses[1].phases[1].resByElement,{});
 assert.deepEqual(bossData.bosses[2].phases.map(p=>p.resByElement.Geo),[70,10]);
