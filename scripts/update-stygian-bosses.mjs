@@ -2,6 +2,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { readLiveStygianRoster } from '../dist/stygian-roster.mjs';
 
 const path = new URL('../dist/stygian-bosses.json', import.meta.url);
+const modulePath = new URL('../dist/stygian-bosses.mjs', import.meta.url);
 const current = JSON.parse(await readFile(path, 'utf8'));
 const live = await readLiveStygianRoster();
 
@@ -51,10 +52,13 @@ const next = {
 };
 
 const comparable = (value) => JSON.stringify(value, (key, entry) => key === 'verified' ? undefined : entry);
+let snapshot = current;
 if (comparable(current) === comparable(next)) {
   console.log(`Stygian ${live.version} roster is already current (${live.bosses.length} bosses).`);
 } else {
   next.verified = live.checkedAt;
+  snapshot = next;
   await writeFile(path, `${JSON.stringify(next, null, 2)}\n`);
   console.log(`Updated Stygian ${live.version}: ${live.bosses.map((boss) => boss.name).join(', ')}`);
 }
+await writeFile(modulePath, `export default ${JSON.stringify(snapshot, null, 2)};\n`);

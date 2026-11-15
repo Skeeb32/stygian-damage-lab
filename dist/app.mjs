@@ -1,5 +1,5 @@
 import {bossGuidesMarkup,setupGuideFilters,reconcileBossSnapshot} from './boss-guides.mjs?v=72';
-import bundledBossSnapshot from './stygian-bosses.json' with {type:'json'};
+import bundledBossSnapshot from './stygian-bosses.mjs?v=1';
 import {slots,subKeys,maxLevel,mainKeys,mainValue,rolls,artifactIssues,applyMain,addRoll} from './artifact-rules.mjs';
 import {energyBudget} from './energy.mjs';
 import {setupBuilder} from './builder.mjs?v=13';
