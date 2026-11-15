@@ -11,6 +11,10 @@ export function validateUid(value) {
   return uid;
 }
 
+const artifactStats={FIGHT_PROP_HP:'hpFlat',FIGHT_PROP_ATTACK:'atkFlat',FIGHT_PROP_DEFENSE:'defFlat',FIGHT_PROP_HP_PERCENT:'hpPct',FIGHT_PROP_ATTACK_PERCENT:'atkPct',FIGHT_PROP_DEFENSE_PERCENT:'defPct',FIGHT_PROP_ELEMENT_MASTERY:'em',FIGHT_PROP_CRITICAL:'cr',FIGHT_PROP_CRITICAL_HURT:'cd',FIGHT_PROP_CHARGE_EFFICIENCY:'er',FIGHT_PROP_HEAL_ADD:'heal',FIGHT_PROP_PHYSICAL_ADD_HURT:'physicalDmg',FIGHT_PROP_FIRE_ADD_HURT:'pyroDmg',FIGHT_PROP_ICE_ADD_HURT:'cryoDmg',FIGHT_PROP_WATER_ADD_HURT:'hydroDmg',FIGHT_PROP_ELEC_ADD_HURT:'electroDmg',FIGHT_PROP_WIND_ADD_HURT:'anemoDmg',FIGHT_PROP_ROCK_ADD_HURT:'geoDmg',FIGHT_PROP_GRASS_ADD_HURT:'dendroDmg'};
+const percentStats=new Set(['hpPct','atkPct','defPct','cr','cd','er','heal','physicalDmg','pyroDmg','cryoDmg','hydroDmg','electroDmg','anemoDmg','geoDmg','dendroDmg']);
+const artifactSlots={EQUIP_BRACER:'Flower',EQUIP_NECKLACE:'Feather',EQUIP_SHOES:'Sands',EQUIP_RING:'Goblet',EQUIP_DRESS:'Circlet'};
+function artifactStat(row){const id=row?.mainPropId||row?.appendPropId||row?.appendPropID||row?.propId||row?.propType;const stat=artifactStats[id]||'';let value=numberFrom(row?.statValue??row?.propValue??row?.value);if(value===null)return null;if(percentStats.has(stat)&&Math.abs(value)<=1.5)value*=100;return stat?{stat,value}:null}
 export function normalizeEnkaShowcase(payload, catalog = {}) {
   if (!payload || typeof payload !== 'object' || !payload.playerInfo) throw new Error('Enka returned an incomplete player profile.');
   if (!Array.isArray(payload.avatarInfoList) || payload.avatarInfoList.length === 0) {
@@ -29,12 +33,14 @@ export function normalizeEnkaShowcase(payload, catalog = {}) {
     const relics = equipList.filter(item => item.reliquary || item.flat?.reliquary).map(item => {
       const relic = item.reliquary || item.flat?.reliquary || {};
       const set = artifacts.get(Number(relic.setId));
+      const flat=item.flat||{},main=artifactStat(flat.reliquaryMainstat||relic.reliquaryMainstat),subs=(flat.reliquarySubstats||relic.reliquarySubstats||[]).map(artifactStat).filter(Boolean).slice(0,4);
       return {
         setId: Number(relic.setId) || null,
         setName: set?.name || '',
         level: Math.max(0, Math.min(20, numberFrom(relic.level) ?? 0)),
-        rarity: Math.max(1, Math.min(5, numberFrom(item.flat?.rankLevel ?? item.rankLevel) ?? 5)),
-        slot: String(item.flat?.equipType || item.equipType || ''),
+        rarity: Math.max(1, Math.min(5, numberFrom(flat.rankLevel ?? item.rankLevel) ?? 5)),
+        slot: artifactSlots[String(flat.equipType || item.equipType || '')] || String(flat.equipType || item.equipType || ''),
+        mainStat:main,substats:subs,
       };
     });
     const level = numberFrom(avatar.propMap?.['4001']) || numberFrom(avatar.level) || 1;
@@ -60,6 +66,6 @@ export function normalizeEnkaShowcase(payload, catalog = {}) {
     level: numberFrom(payload.playerInfo.level),
     worldLevel: numberFrom(payload.playerInfo.worldLevel),
     characters: rows,
-    warnings: ['Only characters in the public Enka showcase are imported. Unshown characters and unequipped items are not available through this UID lookup.', 'Character and weapon records are imported; artifact main/substats and passive conditions still need review in the calculator.'],
+    warnings: ['Only characters in the public Enka showcase are imported. Unshown characters and unequipped items are not available through this UID lookup.', 'Character, weapon, and artifact stats are imported when returned by Enka. Verify artifact values and manually configure weapon passives and other effects.'],
   };
 }

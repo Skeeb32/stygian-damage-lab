@@ -47,7 +47,8 @@ async function enka(request, ctx) {
   if (!/^\d{9}$/.test(uid)) return json({ error: 'Enter a valid 9-digit Genshin UID.' }, 400);
 
   const cacheKey = `enka:${uid}`;
-  const cached = cachedResponse(cacheKey);
+  const forceRefresh = url.searchParams.get('refresh') === '1';
+  const cached = forceRefresh ? null : cachedResponse(cacheKey);
   if (cached) return cached;
 
   let upstream;
