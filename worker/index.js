@@ -4,6 +4,23 @@ import { readLiveStygianRoster } from '../dist/stygian-roster.mjs';
 const USER_AGENT = 'StygianDamageLab/1.0 (https://github.com/Skeeb32/stygian-damage-lab)';
 const MAX_UPSTREAM_BYTES = 2 * 1024 * 1024;
 const defaultTtl = 30;
+const responseCache = new Map();
+
+function cachedResponse(key) {
+  const entry = responseCache.get(key);
+  if (!entry) return null;
+  if (entry.expiresAt <= Date.now()) {
+    responseCache.delete(key);
+    return null;
+  }
+  return new Response(entry.body, { status: entry.status, headers: entry.headers });
+}
+
+async function cacheResponse(key, response, ttl) {
+  const body = await response.clone().text();
+  responseCache.set(key, { body, status: response.status, headers: [...response.headers], expiresAt: Date.now() + ttl * 1000 });
+  while (responseCache.size > 20) responseCache.delete(responseCache.keys().next().value);
+}
 
 function json(body, status = 200, extra = {}) {
   return new Response(JSON.stringify(body), {
@@ -29,9 +46,8 @@ async function enka(request, ctx) {
   const uid = url.searchParams.get('uid') || '';
   if (!/^\d{9}$/.test(uid)) return json({ error: 'Enter a valid 9-digit Genshin UID.' }, 400);
 
-  const cache = globalThis.caches?.default;
-  const cacheKey = new Request(`${url.origin}/__enka-cache/${uid}`);
-  const cached = await cache?.match(cacheKey);
+  const cacheKey = `enka:${uid}`;
+  const cached = cachedResponse(cacheKey);
   if (cached) return cached;
 
   let upstream;
@@ -67,25 +83,18 @@ async function enka(request, ctx) {
 
   const ttl = Math.max(1, Math.min(3600, Number.isFinite(Number(data.ttl)) ? Number(data.ttl) : defaultTtl));
   const result = json({ uid, fetchedAt: new Date().toISOString(), ttl, playerInfo: data.playerInfo, avatarInfoList: Array.isArray(data.avatarInfoList) ? data.avatarInfoList : null });
-  if (cache && ttl > 0) {
-    const response = new Response(await result.clone().text(), {
-      headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': `public, max-age=${ttl}` },
-    });
-    ctx?.waitUntil?.(cache.put(cacheKey, response));
-  }
+  if (ttl > 0) await cacheResponse(cacheKey, result, ttl);
   return result;
 }
 
 async function stygianRoster(request, ctx) {
-  const url = new URL(request.url);
-  const cache = globalThis.caches?.default;
-  const cacheKey = new Request(`${url.origin}/__stygian-roster-cache/v1`);
-  const cached = await cache?.match(cacheKey);
+  const cacheKey = 'stygian:roster:v1';
+  const cached = cachedResponse(cacheKey);
   if (cached) return cached;
   try {
     const roster = await readLiveStygianRoster(fetch);
     const result = json(roster, 200, { 'cache-control': 'public, max-age=1800' });
-    if (cache) ctx?.waitUntil?.(cache.put(cacheKey, result.clone()));
+    await cacheResponse(cacheKey, result, 1800);
     return result;
   } catch {
     return json({ error: 'The current Stygian roster could not be refreshed. The bundled snapshot is still available.' }, 503);
